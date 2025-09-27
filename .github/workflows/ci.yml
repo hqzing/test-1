@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  release:
+    types: [created]
+  push:
+    branches: [ "main" ]
+
+permissions: write-all
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-24.04-arm
+    container:
+      image: ghcr.io/hqzing/docker-openharmony-rootfs:latest
+      volumes:
+        - /tmp/node20:/__e/node20:rw,rshared
+    steps:
+      - name: Setup node for actions
+        run: |
+          curl -L -O https://github.com/hqzing/build-ohos-node/releases/download/v24.2.0/node-v24.2.0-openharmony-arm64.tar.gz
+          mkdir -p /opt /__e/node20/bin
+          tar -zxf node-v24.2.0-openharmony-arm64.tar.gz -C /opt
+          ln -s /opt/node-v24.2.0-openharmony-arm64/bin/node /__e/node20/bin/node
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build
+        run: ./build-perl.sh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          path: "/opt/perl-5.42.0-ohos-arm64.tar.gz"
+          compression-level: 0
+          retention-days: 7
+
+      - name: Upload release asset
+        if: github.event_name == 'release'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }} 
+          asset_path: "/opt/perl-5.42.0-ohos-arm64.tar.gz"
+          asset_name: "perl-5.42.0-ohos-arm64.tar.gz"
+          asset_content_type: application/octet-stream

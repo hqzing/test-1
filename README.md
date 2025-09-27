@@ -1,2 +1,4 @@
 # build-ohos-perl
-Provide prebuilt Perl for OpenHarmony platform.
+This project will build Perl for the OpenHarmony platform and release prebuilt packages.
+
+This Perl is relocatable and can be installed in any directory.
