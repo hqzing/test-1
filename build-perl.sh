@@ -4,14 +4,14 @@ set -e
 alpine_repository="http://dl-cdn.alpinelinux.org/alpine/v3.22/main/aarch64/"
 
 download_alpine_index() {
-    curl -fsSL ${alpine_repository}/APKINDEX.tar.gz | tar -zx -C /tmp
+    curl -fsSL ${alpine_repository}/APKINDEX.tar.gz | tar -zx -C /tmp/
 }
 
 get_apk_url() {
     package_name=$1
-    version=$(grep -A 2 "^P:${package_name}$" /tmp/APKINDEX | grep '^V:' | sed 's/^V://')
-    apk_url="${alpine_repository}${package_name}-${version}.apk"
-    echo $apk_url
+    package_version=$(grep -A1 "^P:${package_name}$" /tmp/APKINDEX | sed -n "s/^V://p")
+    apk_file_name=${package_name}-${package_version}.apk
+    echo ${alpine_repository}/${apk_file_name}
 }
 
 query_component() {
