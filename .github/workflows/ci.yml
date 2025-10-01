@@ -12,7 +12,7 @@ jobs:
   build-and-release:
     runs-on: ubuntu-24.04-arm
     container:
-      image: ghcr.io/hqzing/docker-openharmony-rootfs:main
+      image: ghcr.io/hqzing/docker-openharmony-rootfs:latest
       volumes:
         - /tmp/node:/__e/node20:rw,rshared
     steps:
