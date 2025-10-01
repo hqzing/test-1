@@ -1,20 +1,16 @@
 #!/bin/sh
 set -e
 
-alpine_repository_url="http://dl-cdn.alpinelinux.org/alpine/v3.22/main/aarch64/"
+alpine_repository="http://dl-cdn.alpinelinux.org/alpine/v3.22/main/aarch64/"
 
 download_alpine_index() {
-    mkdir -p /opt/alpine-index
-    cd /opt/alpine-index/
-    curl -fsSL -O "${alpine_repository_url}/APKINDEX.tar.gz"
-    tar -zxf APKINDEX.tar.gz
-    cd - >/dev/null
+    curl -fsSL ${alpine_repository}/APKINDEX.tar.gz | tar -zx -C /tmp
 }
 
 get_apk_url() {
     package_name=$1
-    version=$(grep -A 2 "^P:${package_name}$" /opt/alpine-index/APKINDEX | grep '^V:' | sed 's/^V://')
-    apk_url="${alpine_repository_url}${package_name}-${version}.apk"
+    version=$(grep -A 2 "^P:${package_name}$" /tmp/APKINDEX | grep '^V:' | sed 's/^V://')
+    apk_url="${alpine_repository}${package_name}-${version}.apk"
     echo $apk_url
 }
 
@@ -75,7 +71,7 @@ cd ..
 # Codesign
 export PATH=$PATH:/opt/ohos-sdk/ohos/toolchains/lib
 binary-sign-tool sign -inFile /opt/perl-5.42.0-ohos-arm64/bin/perl -outFile /opt/perl-5.42.0-ohos-arm64/bin/perl -selfSign 1
-find /opt/perl-5.42.0-ohos-arm64/lib/ -type f | grep .so$ | xargs -I {} binary-sign-tool sign -inFile {} -outFile {} -selfSign 1
+find /opt/perl-5.42.0-ohos-arm64/lib/ -type f | grep -E '\.so(\.[0-9]+)*$' | xargs -I {} binary-sign-tool sign -inFile {} -outFile {} -selfSign 1
 
 # Copy the license into the release artifacts
 cp perl5-5.42.0/Copying /opt/perl-5.42.0-ohos-arm64
