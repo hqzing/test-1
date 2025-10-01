@@ -12,14 +12,14 @@ jobs:
   build-and-release:
     runs-on: ubuntu-24.04-arm
     container:
-      image: ghcr.io/hqzing/docker-openharmony-rootfs:latest
+      image: ghcr.io/hqzing/docker-openharmony-rootfs:main
       volumes:
-        - /tmp/node20:/__e/node20:rw,rshared
+        - /tmp/node:/__e/node20:rw,rshared
     steps:
       - name: Setup node for actions
         run: |
           curl -L -O https://github.com/hqzing/build-ohos-node/releases/download/v24.2.0/node-v24.2.0-openharmony-arm64.tar.gz
-          mkdir -p /opt /__e/node20/bin
+          mkdir /__e/node20/bin
           tar -zxf node-v24.2.0-openharmony-arm64.tar.gz -C /opt
           ln -s /opt/node-v24.2.0-openharmony-arm64/bin/node /__e/node20/bin/node
 
